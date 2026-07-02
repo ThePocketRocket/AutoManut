@@ -1,18 +1,18 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useColorScheme } from 'react-native';
+import { Stack } from 'expo-router';
+import { SQLiteProvider } from 'expo-sqlite';
+import { initDatabase } from '../database/schema';
 
-import { AnimatedSplashOverlay } from '@/components/animated-icon';
-import AppTabs from '@/components/app-tabs';
-
-SplashScreen.preventAutoHideAsync();
-
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+export default function RootLayout() {
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <AnimatedSplashOverlay />
-      <AppTabs />
-    </ThemeProvider>
+    <SQLiteProvider databaseName="automanut.db" onInit={initDatabase}>
+      <Stack>
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="home" options={{ headerShown: false }} />
+        <Stack.Screen name="vehicles/index" options={{ title: 'Meus Veículos' }} />
+        <Stack.Screen name="vehicles/add" options={{ title: 'Novo Veículo' }} />
+        <Stack.Screen name="vehicles/[id]" options={{ title: 'Detalhes' }} />
+        <Stack.Screen name="registers/add" options={{ title: 'Novo Lançamento' }} />
+      </Stack>
+    </SQLiteProvider>
   );
 }

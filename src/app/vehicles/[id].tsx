@@ -43,6 +43,10 @@ export default function VehicleDetailsScreen() {
     });
   };
 
+  const handleDeletarRegistro = async (registroId: number) => {
+    await deletarRegistro(db, registroId);
+  };
+
   const renderItem = ({ item }: { item: any }) => (
     <View style={styles.historyCard}>
       <View style={styles.historyHeader}>
@@ -65,6 +69,16 @@ export default function VehicleDetailsScreen() {
             }}
             >
             <Feather name="edit" size={20} color={Colors.primary} />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.iconButton}
+            onPress={ async () => {
+              await handleDeletarRegistro(item.registro_id);
+              await carregarDados();
+            }}
+          >
+            <Feather name="trash-2" size={20} color={Colors.primary} />
           </TouchableOpacity>
         </View>
       </View>

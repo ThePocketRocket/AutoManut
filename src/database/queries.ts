@@ -119,6 +119,31 @@ export const registrarManutencao = async (db: SQLite.SQLiteDatabase, dados: Regi
   });
 };
 
+export const EditarManutencao = async (db: SQLite.SQLiteDatabase, registroId: number, dados: RegistroManutencao) => {
+  await db.withTransactionAsync(async () => {
+    await db.runAsync(
+      `UPDATE Registro SET data = ?, quilometragem = ?, valor = ? 
+      WHERE id = ?`,
+      [dados.data, dados.quilometragem, dados.valor, registroId]
+    );
+
+    await db.runAsync(
+      `UPDATE Manutencao SET tipo_servico = ? 
+      WHERE registro_id = ?`,
+      [dados.tipo_servico, registroId]
+    )
+    
+    if (dados.observacao) {
+      const existe = await db.getFirstAsync('SELECT * FROM Observacao WHERE registro_id = ?', registroId);
+      if (existe) {
+        await db.runAsync('UPDATE Observacao SET texto = ? WHERE registro_id = ?', dados.observacao, registroId);
+      } else {
+        await db.runAsync('INSERT INTO Observacao (registro_id, texto) VALUES (?, ?)', registroId, dados.observacao);
+      }
+    }
+  });
+};
+
 // Histórico Cronológico e Cálculos
 export const getHistoricoCronologico = async (db: SQLite.SQLiteDatabase, veiculoId: number) => {
   const query = `

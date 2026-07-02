@@ -54,7 +54,7 @@ export const deleteVeiculo = async (db: SQLite.SQLiteDatabase, id: number) => {
   }
 };
 
-// Lançamentos
+// Crud Registros (Abastecimento e Manutenção)
 export const registrarAbastecimento = async (db: SQLite.SQLiteDatabase, dados: RegistroAbastecimento) => {
   // SQLite no Expo SDK 54 usa async/await pra transações se quisermos, 
   // mas pra garantir rollback se der erro, executamos uma query contínua ou usamos execAsync
@@ -69,13 +69,31 @@ export const registrarAbastecimento = async (db: SQLite.SQLiteDatabase, dados: R
       'INSERT INTO Abastecimento (registro_id, litros) VALUES (?, ?)',
       registroId, dados.litros
     );
+  });
+};
 
-    if (dados.observacao) {
+export const EditarAbastecimento = async (db: SQLite.SQLiteDatabase, registroId: number, dados:RegistroAbastecimento) => {
+  await db.withTransactionAsync(async () => {
       await db.runAsync(
-        'INSERT INTO Observacao (registro_id, texto) VALUES (?, ?)',
-        registroId, dados.observacao
+        `UPDATE Registro SET data = ?, quilometragem = ?, valor = ? 
+        WHERE id = ?`,
+        [dados.data, dados.quilometragem, dados.valor, registroId]
       );
-    }
+
+      await db.runAsync(
+        `UPDATE Abastecimento SET litros = ? 
+        WHERE registro_id = ?`,
+        [dados.litros, registroId]
+      );
+
+      if (dados.observacao) {
+        const existe = await db.getFirstAsync('SELECT * FROM Observacao WHERE registro_id = ?', registroId);
+        if (existe) {
+          await db.runAsync('UPDATE Observacao SET texto = ? WHERE registro_id = ?', dados.observacao, registroId);
+        } else {
+          await db.runAsync('INSERT INTO Observacao (registro_id, texto) VALUES (?, ?)', registroId, dados.observacao);
+        }
+      }
   });
 };
 

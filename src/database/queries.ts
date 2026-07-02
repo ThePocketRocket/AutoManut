@@ -144,6 +144,12 @@ export const EditarManutencao = async (db: SQLite.SQLiteDatabase, registroId: nu
   });
 };
 
+export const deletarRegistro = async (db: SQLite.SQLiteDatabase, registroId: number) => {
+  await db.withTransactionAsync(async () => {
+    await db.runAsync('DELETE FROM Registro WHERE id = ?', registroId);
+  });
+};
+
 // Histórico Cronológico e Cálculos
 export const getHistoricoCronologico = async (db: SQLite.SQLiteDatabase, veiculoId: number) => {
   const query = `

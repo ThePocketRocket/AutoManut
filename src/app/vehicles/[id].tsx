@@ -1,9 +1,9 @@
-import { useLocalSearchParams } from 'expo-router';
-import { StatusBar, StyleSheet, Text, View, FlatList } from 'react-native';
+import { router, useLocalSearchParams } from 'expo-router';
+import { StatusBar, StyleSheet, Text, View, FlatList, Touchable, TouchableOpacity } from 'react-native';
 import { Colors } from '../../constants/Colors';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useEffect, useState } from 'react';
-import { getVeiculoById, getHistoricoCronologico, calcularMediaConsumo, Veiculo } from '../../database/queries';
+import { getVeiculoById, getHistoricoCronologico, calcularMediaConsumo, Veiculo, deletarRegistro } from '../../database/queries';
 import { useIsFocused } from '@react-navigation/native';
 import { Feather } from '@expo/vector-icons';
 
@@ -34,6 +34,15 @@ export default function VehicleDetailsScreen() {
     setMediaConsumo(consumo);
   };
 
+  const handleEditarRegistro = async (registro: number) => {
+    router.push({
+      pathname: '/registers/add',
+      params: {
+        registroId: registro.toString()
+      }
+    });
+  };
+
   const renderItem = ({ item }: { item: any }) => (
     <View style={styles.historyCard}>
       <View style={styles.historyHeader}>
@@ -45,7 +54,19 @@ export default function VehicleDetailsScreen() {
           />
           <Text style={styles.historyTypeText}>{item.tipo}</Text>
         </View>
+
         <Text style={styles.historyDate}>{item.data}</Text>
+
+        <View style={styles.actions}>
+          <TouchableOpacity
+            style={styles.iconButton}
+            onPress={() => {
+              handleEditarRegistro(item.registro_id);
+            }}
+            >
+            <Feather name="edit" size={20} color={Colors.primary} />
+          </TouchableOpacity>
+        </View>
       </View>
       
       <View style={styles.historyBody}>
@@ -207,5 +228,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: Colors.textMuted,
     marginTop: 24,
+  },
+  actions: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  },
+  iconButton: {
+    marginLeft: 12,
+    padding: 4,
   }
 });

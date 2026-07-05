@@ -69,10 +69,17 @@ export const registrarAbastecimento = async (db: SQLite.SQLiteDatabase, dados: R
       'INSERT INTO Abastecimento (registro_id, litros) VALUES (?, ?)',
       registroId, dados.litros
     );
+
+    if (dados.observacao) {
+      await db.runAsync(
+        'INSERT INTO Observacao (registro_id, texto) VALUES (?, ?)',
+        registroId, dados.observacao
+      );
+    }
   });
 };
 
-export const EditarAbastecimento = async (db: SQLite.SQLiteDatabase, registroId: number, dados:RegistroAbastecimento) => {
+export const editarAbastecimento = async (db: SQLite.SQLiteDatabase, registroId: number, dados:RegistroAbastecimento) => {
   await db.withTransactionAsync(async () => {
       await db.runAsync(
         `UPDATE Registro SET data = ?, quilometragem = ?, valor = ? 
@@ -86,13 +93,15 @@ export const EditarAbastecimento = async (db: SQLite.SQLiteDatabase, registroId:
         [dados.litros, registroId]
       );
 
-      if (dados.observacao) {
-        const existe = await db.getFirstAsync('SELECT * FROM Observacao WHERE registro_id = ?', registroId);
+      const existe = await db.getFirstAsync('SELECT * FROM Observacao WHERE registro_id = ?', registroId);
+      if (dados.observacao && dados.observacao.trim() !== '') {
         if (existe) {
           await db.runAsync('UPDATE Observacao SET texto = ? WHERE registro_id = ?', dados.observacao, registroId);
         } else {
           await db.runAsync('INSERT INTO Observacao (registro_id, texto) VALUES (?, ?)', registroId, dados.observacao);
         }
+      } else if (existe) {
+          await db.runAsync('DELETE FROM Observacao WHERE registro_id = ?', registroId);
       }
   });
 };
@@ -119,7 +128,7 @@ export const registrarManutencao = async (db: SQLite.SQLiteDatabase, dados: Regi
   });
 };
 
-export const EditarManutencao = async (db: SQLite.SQLiteDatabase, registroId: number, dados: RegistroManutencao) => {
+export const editarManutencao = async (db: SQLite.SQLiteDatabase, registroId: number, dados: RegistroManutencao) => {
   await db.withTransactionAsync(async () => {
     await db.runAsync(
       `UPDATE Registro SET data = ?, quilometragem = ?, valor = ? 
@@ -133,13 +142,15 @@ export const EditarManutencao = async (db: SQLite.SQLiteDatabase, registroId: nu
       [dados.tipo_servico, registroId]
     )
     
-    if (dados.observacao) {
-      const existe = await db.getFirstAsync('SELECT * FROM Observacao WHERE registro_id = ?', registroId);
+    const existe = await db.getFirstAsync('SELECT * FROM Observacao WHERE registro_id = ?', registroId);
+    if (dados.observacao && dados.observacao.trim() !== '') {
       if (existe) {
         await db.runAsync('UPDATE Observacao SET texto = ? WHERE registro_id = ?', dados.observacao, registroId);
       } else {
         await db.runAsync('INSERT INTO Observacao (registro_id, texto) VALUES (?, ?)', registroId, dados.observacao);
       }
+    } else if (existe) {
+        await db.runAsync('DELETE FROM Observacao WHERE registro_id = ?', registroId);
     }
   });
 };

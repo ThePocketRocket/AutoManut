@@ -14,15 +14,7 @@ import {
   View,
 } from "react-native";
 import { Colors } from "../../constants/Colors";
-import {
-  editarAbastecimento,
-  editarManutencao,
-  getRegistroById,
-  getVeiculos,
-  registrarAbastecimento,
-  registrarManutencao,
-  Veiculo,
-} from "../../database/queries";
+import { editarAbastecimento, editarManutencao, getRegistroById, getVeiculos, registrarAbastecimento, registrarManutencao, Veiculo, } from "../../database/queries";
 
 export default function AddRegisterScreen() {
   const router = useRouter();
@@ -30,9 +22,7 @@ export default function AddRegisterScreen() {
 
   const [veiculos, setVeiculos] = useState<Veiculo[]>([]);
   const [veiculoId, setVeiculoId] = useState<number | null>(null);
-  const [tipo, setTipo] = useState<"ABASTECIMENTO" | "MANUTENCAO">(
-    "ABASTECIMENTO",
-  );
+  const [tipo, setTipo] = useState<"ABASTECIMENTO" | "MANUTENCAO">("ABASTECIMENTO",);
 
   // Campos Comuns
   const [data, setData] = useState(new Date().toISOString().split("T")[0]); // YYYY-MM-DD
@@ -176,36 +166,17 @@ export default function AddRegisterScreen() {
         {!editandoRegistro && (
           <View style={styles.toggleContainer}>
             <TouchableOpacity
-              style={[
-                styles.toggleButton,
-                tipo === "ABASTECIMENTO" && styles.toggleActive,
-              ]}
+              style={[styles.toggleButton,tipo === "ABASTECIMENTO" && styles.toggleActive]}
               onPress={() => setTipo("ABASTECIMENTO")}
             >
               <Text
-                style={[
-                  styles.toggleText,
-                  tipo === "ABASTECIMENTO" && styles.toggleTextActive,
-                ]}
-              >
-                Abastecimento
-              </Text>
+                style={[styles.toggleText, tipo === "ABASTECIMENTO" && styles.toggleTextActive]}>Abastecimento</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[
-                styles.toggleButton,
-                tipo === "MANUTENCAO" && styles.toggleActive,
-              ]}
+              style={[styles.toggleButton,tipo === "MANUTENCAO" && styles.toggleActive]}
               onPress={() => setTipo("MANUTENCAO")}
             >
-              <Text
-                style={[
-                  styles.toggleText,
-                  tipo === "MANUTENCAO" && styles.toggleTextActive,
-                ]}
-              >
-                Manutenção
-              </Text>
+              <Text style={[styles.toggleText,tipo === "MANUTENCAO" && styles.toggleTextActive]}>Manutenção</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -218,20 +189,10 @@ export default function AddRegisterScreen() {
               {veiculos.map((v) => (
                 <TouchableOpacity
                   key={v.id}
-                  style={[
-                    styles.vehicleBtn,
-                    veiculoId === v.id && styles.vehicleBtnActive,
-                  ]}
+                  style={[ styles.vehicleBtn,veiculoId === v.id && styles.vehicleBtnActive]}
                   onPress={() => setVeiculoId(v.id)}
                 >
-                  <Text
-                    style={[
-                      styles.vehicleBtnText,
-                      veiculoId === v.id && styles.vehicleBtnTextActive,
-                    ]}
-                  >
-                    {v.placa}
-                  </Text>
+                  <Text style={[styles.vehicleBtnText, veiculoId === v.id && styles.vehicleBtnTextActive]}>{v.placa}</Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -244,66 +205,35 @@ export default function AddRegisterScreen() {
         <View style={styles.row}>
           <View style={{ flex: 1, marginRight: 8 }}>
             <Text style={styles.label}>Odômetro (KM)</Text>
-            <TextInput
-              style={styles.input}
-              keyboardType="numeric"
-              value={quilometragem}
-              onChangeText={setQuilometragem}
-              placeholder="Ex: 50000"
-            />
+            <TextInput style={styles.input} keyboardType="numeric" value={quilometragem} onChangeText={setQuilometragem} placeholder="Ex: 50000" />
           </View>
           <View style={{ flex: 1, marginLeft: 8 }}>
             <Text style={styles.label}>Valor (R$)</Text>
-            <TextInput
-              style={styles.input}
-              keyboardType="numeric"
-              value={valor}
-              onChangeText={setValor}
-              placeholder="Ex: 150.00"
-            />
+            <TextInput style={styles.input} keyboardType="numeric" value={valor} onChangeText={setValor} placeholder="Ex: 150.00"/>
           </View>
         </View>
 
         {tipo === "ABASTECIMENTO" ? (
           <View>
             <Text style={styles.label}>Litros</Text>
-            <TextInput
-              style={styles.input}
-              keyboardType="numeric"
-              value={litros}
-              onChangeText={setLitros}
-              placeholder="Ex: 40.5"
-            />
+            <TextInput style={styles.input} keyboardType="numeric" value={litros} onChangeText={setLitros} placeholder="Ex: 40.5" />
           </View>
         ) : (
           <View>
             <Text style={styles.label}>Tipo de Serviço</Text>
-            <TextInput
-              style={styles.input}
-              value={tipoServico}
-              onChangeText={setTipoServico}
-              placeholder="Ex: Troca de Óleo"
-            />
+            <TextInput style={styles.input} value={tipoServico} onChangeText={setTipoServico} placeholder="Ex: Troca de Óleo" />
           </View>
         )}
 
         <Text style={styles.label}>Observações (Opcional)</Text>
-        <TextInput
-          style={[styles.input, { height: 80, textAlignVertical: "top" }]}
-          multiline
-          value={observacao}
-          onChangeText={setObservacao}
-          placeholder="Anotações adicionais..."
-        />
+        <TextInput style={[styles.input, { height: 80, textAlignVertical: "top" }]} multiline value={observacao} onChangeText={setObservacao} placeholder="Anotações adicionais..."/>
 
         <TouchableOpacity
           style={styles.button}
           onPress={handleSalvar}
           activeOpacity={0.8}
         >
-          <Text style={styles.buttonText}>
-            {editandoRegistro ? "ATUALIZAR" : "REGISTRAR"}
-          </Text>
+          <Text style={styles.buttonText}>{editandoRegistro ? "ATUALIZAR" : "REGISTRAR"}</Text>
         </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>

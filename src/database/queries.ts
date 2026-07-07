@@ -161,6 +161,20 @@ export const deletarRegistro = async (db: SQLite.SQLiteDatabase, registroId: num
   });
 };
 
+export const getRegistroById = async (db: SQLite.SQLiteDatabase, registroId: number): Promise<any | null> => {
+  const registro = await db.getFirstAsync<any>(
+    `SELECT r.id as registro_id, r.veiculo_id, r.tipo, r.data, r.quilometragem, r.valor,
+            a.litros, m.tipo_servico, o.texto as observacao
+     FROM Registro r
+     LEFT JOIN Abastecimento a ON r.id = a.registro_id
+     LEFT JOIN Manutencao m ON r.id = m.registro_id
+     LEFT JOIN Observacao o ON r.id = o.registro_id
+     WHERE r.id = ?`,
+    registroId
+  );
+  return registro || null;
+};
+
 // Histórico Cronológico e Cálculos
 export const getHistoricoCronologico = async (db: SQLite.SQLiteDatabase, veiculoId: number) => {
   const query = `

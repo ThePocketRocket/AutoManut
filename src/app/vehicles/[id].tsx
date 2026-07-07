@@ -34,11 +34,12 @@ export default function VehicleDetailsScreen() {
     setMediaConsumo(consumo);
   };
 
-  const handleEditarRegistro = async (registro: number) => {
+  const handleEditarRegistro = async (item : any) => {
     router.push({
       pathname: '/registers/add',
       params: {
-        registroId: registro.toString()
+        registroId: item.registro_id.toString(),
+        tipo: item.tipo
       }
     });
   };
@@ -65,7 +66,7 @@ export default function VehicleDetailsScreen() {
           <TouchableOpacity
             style={styles.iconButton}
             onPress={() => {
-              handleEditarRegistro(item.registro_id);
+              handleEditarRegistro(item);
             }}
             >
             <Feather name="edit" size={20} color={Colors.primary} />

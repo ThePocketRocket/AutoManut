@@ -44,6 +44,39 @@ Se você quer modificar ou entender como o aplicativo funciona, o coração dele
 
 ---
 
+## Build
+
+Para realizar o build para apk siga os passos:
+
+1. Informe onde o sdk do android está instalado:
+
+```zsh
+export  ANDROID_HOME=/home/joelmir/Android/Sdk
+```
+2. Execute o pre-build na raiz do projeto:
+```zsh
+npx expo prebuild --platform android
+```
+
+3. Navegue para a pasta `android` criada pelo pre-build:
+
+```zsh
+cd android
+```
+
+4. Execute o build:
+```zsh
+./gradlew assembleRelease
+```
+
+4. Encontre o apk na pasta `app/build/outputs/apk/release/`.
+
+---
+
+**Obs:** Para limpar o build antigo execute: ```zsh ./gradlew clean ``` (com o terminal na pasta `android`)
+
+---
+
 ## 📚 Links Úteis para o Futuro
 
 À medida que você for evoluindo (médio a longo prazo), estes links serão essenciais:

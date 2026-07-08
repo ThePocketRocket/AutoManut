@@ -11,8 +11,29 @@ export default function RootLayout() {
         <Stack.Screen name="vehicles/index" options={{ title: 'Meus Veículos' }} />
         <Stack.Screen name="vehicles/add" options={{ title: 'Novo Veículo' }} />
         <Stack.Screen name="vehicles/[id]" options={{ title: 'Detalhes' }} />
-        <Stack.Screen name="registers/add" options={{ title: 'Novo Lançamento' }} />
-      </Stack>
+        <Stack.Screen 
+          name="registers/add" 
+          options={({ route }) => {
+            const params = route.params as {
+              registroId?: string;
+              tipo?: string;
+            };
+
+            if (params?.registroId) {
+              return {
+                title:
+                  params.tipo === 'ABASTECIMENTO'
+                    ? 'Editar Abastecimento'
+                    : 'Editar Manutenção',
+              };
+            }
+
+          return {
+            title: 'Novo Lançamento',
+          };
+        }}
+      />
+    </Stack>
     </SQLiteProvider>
   );
 }

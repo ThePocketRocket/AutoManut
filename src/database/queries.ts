@@ -54,7 +54,7 @@ export const deleteVeiculo = async (db: SQLite.SQLiteDatabase, id: number) => {
   }
 };
 
-// Lançamentos
+// Crud Registros (Abastecimento e Manutenção)
 export const registrarAbastecimento = async (db: SQLite.SQLiteDatabase, dados: RegistroAbastecimento) => {
   // SQLite no Expo SDK 54 usa async/await pra transações se quisermos, 
   // mas pra garantir rollback se der erro, executamos uma query contínua ou usamos execAsync
@@ -79,6 +79,33 @@ export const registrarAbastecimento = async (db: SQLite.SQLiteDatabase, dados: R
   });
 };
 
+export const editarAbastecimento = async (db: SQLite.SQLiteDatabase, registroId: number, dados:RegistroAbastecimento) => {
+  await db.withTransactionAsync(async () => {
+      await db.runAsync(
+        `UPDATE Registro SET data = ?, quilometragem = ?, valor = ? 
+        WHERE id = ?`,
+        [dados.data, dados.quilometragem, dados.valor, registroId]
+      );
+
+      await db.runAsync(
+        `UPDATE Abastecimento SET litros = ? 
+        WHERE registro_id = ?`,
+        [dados.litros, registroId]
+      );
+
+      const existe = await db.getFirstAsync('SELECT * FROM Observacao WHERE registro_id = ?', registroId);
+      if (dados.observacao && dados.observacao.trim() !== '') {
+        if (existe) {
+          await db.runAsync('UPDATE Observacao SET texto = ? WHERE registro_id = ?', dados.observacao, registroId);
+        } else {
+          await db.runAsync('INSERT INTO Observacao (registro_id, texto) VALUES (?, ?)', registroId, dados.observacao);
+        }
+      } else if (existe) {
+          await db.runAsync('DELETE FROM Observacao WHERE registro_id = ?', registroId);
+      }
+  });
+};
+
 export const registrarManutencao = async (db: SQLite.SQLiteDatabase, dados: RegistroManutencao) => {
   await db.withTransactionAsync(async () => {
     const result = await db.runAsync(
@@ -99,6 +126,53 @@ export const registrarManutencao = async (db: SQLite.SQLiteDatabase, dados: Regi
       );
     }
   });
+};
+
+export const editarManutencao = async (db: SQLite.SQLiteDatabase, registroId: number, dados: RegistroManutencao) => {
+  await db.withTransactionAsync(async () => {
+    await db.runAsync(
+      `UPDATE Registro SET data = ?, quilometragem = ?, valor = ? 
+      WHERE id = ?`,
+      [dados.data, dados.quilometragem, dados.valor, registroId]
+    );
+
+    await db.runAsync(
+      `UPDATE Manutencao SET tipo_servico = ? 
+      WHERE registro_id = ?`,
+      [dados.tipo_servico, registroId]
+    )
+    
+    const existe = await db.getFirstAsync('SELECT * FROM Observacao WHERE registro_id = ?', registroId);
+    if (dados.observacao && dados.observacao.trim() !== '') {
+      if (existe) {
+        await db.runAsync('UPDATE Observacao SET texto = ? WHERE registro_id = ?', dados.observacao, registroId);
+      } else {
+        await db.runAsync('INSERT INTO Observacao (registro_id, texto) VALUES (?, ?)', registroId, dados.observacao);
+      }
+    } else if (existe) {
+        await db.runAsync('DELETE FROM Observacao WHERE registro_id = ?', registroId);
+    }
+  });
+};
+
+export const deletarRegistro = async (db: SQLite.SQLiteDatabase, registroId: number) => {
+  await db.withTransactionAsync(async () => {
+    await db.runAsync('DELETE FROM Registro WHERE id = ?', registroId);
+  });
+};
+
+export const getRegistroById = async (db: SQLite.SQLiteDatabase, registroId: number): Promise<any | null> => {
+  const registro = await db.getFirstAsync<any>(
+    `SELECT r.id as registro_id, r.veiculo_id, r.tipo, r.data, r.quilometragem, r.valor,
+            a.litros, m.tipo_servico, o.texto as observacao
+     FROM Registro r
+     LEFT JOIN Abastecimento a ON r.id = a.registro_id
+     LEFT JOIN Manutencao m ON r.id = m.registro_id
+     LEFT JOIN Observacao o ON r.id = o.registro_id
+     WHERE r.id = ?`,
+    registroId
+  );
+  return registro || null;
 };
 
 // Histórico Cronológico e Cálculos
